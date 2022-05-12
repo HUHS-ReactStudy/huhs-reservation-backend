@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 import { IUserModel } from './User';
 
-interface IReservation {
+export interface IReservation {
   purpose: string;
   year: number;
   month: number;
