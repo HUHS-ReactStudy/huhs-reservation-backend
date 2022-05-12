@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "prebuild": "./node_modules/.bin/rimraf ./dist",
-    "start:dev": "./node_modules/.bin/tsc-watch --outDir ./dist --onSuccess \"node ./dist/app.js\""
+    "start:dev": "./node_modules/.bin/tsc-watch --outDir ./dist --onSuccess \"node ./dist/server.js\""
   },
   "repository": {
     "type": "git",
