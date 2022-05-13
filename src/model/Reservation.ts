@@ -1,5 +1,11 @@
-import mongoose, { Document, Schema, Model } from 'mongoose';
-import { IUserModel } from './User';
+import mongoose, { Document, Schema, Model, ObjectId } from 'mongoose';
+import { IUser } from './User';
+
+interface FindByDateParams {
+  year?: number;
+  month?: number;
+  day?: number;
+}
 
 export interface IReservation {
   purpose: string;
@@ -9,14 +15,18 @@ export interface IReservation {
   startTime: string;
   endTime: string;
   people: number;
-  userId: string | IUserModel;
+  userId: ObjectId | IUser;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Method를 정의하는 부분
-interface IReservationDocument extends IReservation, Document {}
+export interface IReservationDocument extends IReservation, Document {}
 
 // Static Method를 정의하는 부분
-export interface IReservationModel extends Model<IReservationDocument> {}
+export interface IReservationModel extends Model<IReservationDocument> {
+  findByDate: (date: FindByDateParams) => Promise<IReservationDocument[]>;
+}
 
 // Schema를 생성하는 부분
 const ReservationSchema: Schema<IReservationDocument> = new Schema(
@@ -36,6 +46,11 @@ const ReservationSchema: Schema<IReservationDocument> = new Schema(
   },
   { timestamps: { createdAt: true } },
 );
+
+// Static Method를 구현하는 부분
+ReservationSchema.statics.findByDate = function (date: FindByDateParams) {
+  return this.find(date);
+};
 
 const Reservation = mongoose.model<IReservationDocument, IReservationModel>('Reservation', ReservationSchema);
 
