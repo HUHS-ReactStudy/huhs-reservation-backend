@@ -10,7 +10,9 @@ export interface IUser {
 interface IUserDocument extends IUser, Document {}
 
 // Static Method를 정의하는 부분
-export interface IUserModel extends Model<IUserDocument> {}
+export interface IUserModel extends Model<IUserDocument> {
+  findByStudentId: (studentId: string) => Promise<IUserDocument>;
+}
 
 // Schema를 생성하는 부분
 const UserSchema: Schema<IUserDocument> = new Schema({
@@ -31,9 +33,9 @@ const UserSchema: Schema<IUserDocument> = new Schema({
 // };
 
 // Static Method를 구현하는 부분
-// UserSchema.statics.findByUsername = function (username: string) {
-//   return this.findOne({ username });
-// };
+UserSchema.statics.findByStudentId = function (studentId: string) {
+  return this.findOne({ studentId });
+};
 
 const User = mongoose.model<IUserDocument, IUserModel>('User', UserSchema);
 
