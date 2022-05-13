@@ -1,6 +1,17 @@
 import Joi from 'joi';
 
-export const addReservationSchema = Joi.object({
+export const getMonthlyReservationsQuerySchema = Joi.object({
+  year: Joi.number().required(),
+  month: Joi.number().required(),
+});
+
+export const getDailyReservationsQuerySchema = Joi.object({
+  year: Joi.number().required(),
+  month: Joi.number().required(),
+  day: Joi.number().required(),
+});
+
+export const addReservationBodySchema = Joi.object({
   name: Joi.string().required(),
   studentId: Joi.string().required(),
   department: Joi.string().required(),
