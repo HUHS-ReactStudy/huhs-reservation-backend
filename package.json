@@ -24,6 +24,7 @@
     "@types/koa__router": "^8.0.11",
     "@types/koa-bodyparser": "^4.3.7",
     "@types/koa-logger": "^3.1.2",
+    "@types/yamljs": "^0.2.31",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",
     "eslint": "^8.15.0",
@@ -43,6 +44,8 @@
     "koa-bodyparser": "^4.3.0",
     "koa-helmet": "^6.1.0",
     "koa-logger": "^3.2.1",
-    "mongoose": "^6.3.3"
+    "koa2-swagger-ui": "^5.5.1",
+    "mongoose": "^6.3.3",
+    "yamljs": "^0.3.0"
   }
 }
