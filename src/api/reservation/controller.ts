@@ -3,7 +3,7 @@ import Reservation, { IReservationDocument } from '../../model/Reservation';
 import User, { IUser } from '../../model/User';
 import addZero from '../../utils/add-zero';
 import bodyValidator from '../../utils/body-validator';
-import validateDate from '../../utils/validate-date';
+import validateReservationDateTime from '../../utils/validate-date';
 import { IAddReservationRequestBody, IGetDailyReservationsQuery, IGetMonthlyReservationsQuery } from './interfaces';
 import { addReservationBodySchema, getDailyReservationsQuerySchema, getMonthlyReservationsQuerySchema } from './joi-schema';
 
@@ -104,7 +104,8 @@ export const addReservation = async (ctx: Context) => {
     };
     return;
   }
-  if (!validateDate(value.year, value.month, value.day)) {
+  // 최대 예약 시간 체크하기
+  if (!validateReservationDateTime(value.year, value.month, value.day, value.startTime, value.endTime)) {
     ctx.status = 400;
     ctx.body = {
       status: 'error',
@@ -115,7 +116,10 @@ export const addReservation = async (ctx: Context) => {
     return;
   }
   const isExistance = await Reservation.exists({
-    $or: [{ startTime: { $gt: value.startTime, $lt: value.endTime } }, { endTime: { $gt: value.startTime, $lt: value.endTime } }],
+    $or: [
+      { $and: [{ startTime: { $gt: value.startTime } }, { startTime: { $lt: value.endTime } }] },
+      { $and: [{ endTime: { $gt: value.startTime } }, { endTime: { $lt: value.endTime } }] },
+    ],
   });
   if (isExistance) {
     ctx.status = 400;
