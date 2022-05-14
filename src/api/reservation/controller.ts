@@ -12,15 +12,34 @@ export const getMonthlyReservations = async (ctx: Context) => {
   });
   if (error) {
     ctx.status = 400;
-    ctx.body = error;
+    ctx.body = {
+      status: 'error',
+      statusCode: 400,
+      data: null,
+      message: error,
+    };
     return;
   }
-  const rawReservations = await Reservation.findByDate(value);
-  const extractDate = (r: IReservationDocument) => `${r.year}-${addZero(r.month)}-${addZero(r.day)}`;
-  const date = rawReservations.map(extractDate);
-  ctx.status = 200;
-  ctx.body = date;
-  return;
+  try {
+    const rawReservations = await Reservation.findByDate(value);
+    const extractDate = (r: IReservationDocument) => `${r.year}-${addZero(r.month)}-${addZero(r.day)}`;
+    const date = rawReservations.map(extractDate);
+    ctx.status = 200;
+    ctx.body = {
+      status: 'success',
+      statusCode: 200,
+      data: date,
+      message: null,
+    };
+    return;
+  } catch (error) {
+    ctx.throw(500, {
+      status: 'error',
+      statusCode: 500,
+      data: null,
+      message: 'Interval Server Error',
+    });
+  }
 };
 
 export const getDailyReservations = async (ctx: Context) => {
@@ -29,36 +48,61 @@ export const getDailyReservations = async (ctx: Context) => {
   });
   if (error) {
     ctx.status = 400;
-    ctx.body = error;
+    ctx.body = {
+      status: 'error',
+      statusCode: 400,
+      data: null,
+      message: error,
+    };
     return;
   }
-  const rawReservations = await Reservation.find(value, null, { sort: { createdAt: 1, startTime: 1 } }).populate({
-    path: 'userId',
-  });
-  const reservations = rawReservations.map(({ purpose, year, month, day, startTime, endTime, people, userId }) => ({
-    purpose,
-    year,
-    month,
-    day,
-    startTime,
-    endTime,
-    people,
-    user: {
-      name: (userId as IUser).name,
-      department: (userId as IUser).department,
-    },
-  }));
-  ctx.status = 200;
-  ctx.body = reservations;
-  return;
+  try {
+    const rawReservations = await Reservation.find(value, null, { sort: { createdAt: 1, startTime: 1 } }).populate({
+      path: 'userId',
+    });
+    const reservations = rawReservations.map(({ purpose, year, month, day, startTime, endTime, people, userId }) => ({
+      purpose,
+      year,
+      month,
+      day,
+      startTime,
+      endTime,
+      people,
+      user: {
+        name: (userId as IUser).name,
+        department: (userId as IUser).department,
+      },
+    }));
+    ctx.status = 200;
+    ctx.body = {
+      status: 'success',
+      statusCode: 200,
+      data: reservations,
+      message: null,
+    };
+    return;
+  } catch (error) {
+    ctx.throw(500, {
+      status: 'error',
+      statusCode: 500,
+      data: null,
+      message: 'Interval Server Error',
+    });
+  }
 };
 
 // 예약되어 있는 시간대는 예약을 못하도록 막는 로직 추가할 것
+// 해당 날짜가 유효한 날짜인지 체크할 것
 export const addReservation = async (ctx: Context) => {
   const { error, value } = bodyValidator<IAddReservationRequestBody>(ctx.request.body, addReservationBodySchema);
   if (error) {
     ctx.status = 400;
-    ctx.body = error;
+    ctx.body = {
+      status: 'error',
+      statusCode: 400,
+      data: null,
+      message: error,
+    };
     return;
   }
   const { name, studentId, department, ...reservationData } = value;
@@ -71,9 +115,20 @@ export const addReservation = async (ctx: Context) => {
       userId = user.id;
     }
     const reservation = await Reservation.create({ userId, ...reservationData });
+    const { purpose, year, month, day, startTime, endTime, people } = reservation;
     ctx.status = 201;
-    ctx.body = reservation;
+    ctx.body = {
+      status: 'success',
+      statusCode: 201,
+      data: { purpose, year, month, day, startTime, endTime, people, user: { name, department } },
+      message: null,
+    };
   } catch (error) {
-    ctx.throw(500, 'Interval Server Error');
+    ctx.throw(500, {
+      status: 'error',
+      statusCode: 500,
+      data: null,
+      message: 'Interval Server Error',
+    });
   }
 };
