@@ -6,7 +6,7 @@ import reservationRouter from './reservation';
 
 const rootRouter = new Router({ prefix: '/api/v1' });
 
-rootRouter.use('/reservation', reservationRouter.routes());
+rootRouter.use('/reservations', reservationRouter.routes());
 
 rootRouter.use(helmet()).use(logger()).use(bodyParser());
 
