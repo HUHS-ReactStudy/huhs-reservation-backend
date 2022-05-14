@@ -94,7 +94,7 @@ paths:
                     nullable: true
                     example: null
         '400':
-          description: Body Property의 데이터 타입이 잘못된 경우입니다.
+          description: Body Property의 데이터 타입이 잘못된 경우 or 유효하지 않은 날짜인 경우 or 시간대가 겹치는 경우입니다.
           content:
             application/json:
               schema:
