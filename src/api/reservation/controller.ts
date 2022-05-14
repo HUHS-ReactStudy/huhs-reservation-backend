@@ -3,6 +3,7 @@ import Reservation, { IReservationDocument } from '../../model/Reservation';
 import User, { IUser } from '../../model/User';
 import addZero from '../../utils/add-zero';
 import bodyValidator from '../../utils/body-validator';
+import validateDate from '../../utils/validate-date';
 import { IAddReservationRequestBody, IGetDailyReservationsQuery, IGetMonthlyReservationsQuery } from './interfaces';
 import { addReservationBodySchema, getDailyReservationsQuerySchema, getMonthlyReservationsQuerySchema } from './joi-schema';
 
@@ -91,8 +92,6 @@ export const getDailyReservations = async (ctx: Context) => {
   }
 };
 
-// 예약되어 있는 시간대는 예약을 못하도록 막는 로직 추가할 것
-// 해당 날짜가 유효한 날짜인지 체크할 것
 export const addReservation = async (ctx: Context) => {
   const { error, value } = bodyValidator<IAddReservationRequestBody>(ctx.request.body, addReservationBodySchema);
   if (error) {
@@ -102,6 +101,29 @@ export const addReservation = async (ctx: Context) => {
       statusCode: 400,
       data: null,
       message: error,
+    };
+    return;
+  }
+  if (!validateDate(value.year, value.month, value.day)) {
+    ctx.status = 400;
+    ctx.body = {
+      status: 'error',
+      statusCode: 400,
+      data: null,
+      message: '유효하지 않은 날짜입니다.',
+    };
+    return;
+  }
+  const isExistance = await Reservation.exists({
+    $or: [{ startTime: { $gt: value.startTime, $lt: value.endTime } }, { endTime: { $gt: value.startTime, $lt: value.endTime } }],
+  });
+  if (isExistance) {
+    ctx.status = 400;
+    ctx.body = {
+      status: 'error',
+      statusCode: 400,
+      data: null,
+      message: '이미 예약된 날짜입니다.',
     };
     return;
   }
