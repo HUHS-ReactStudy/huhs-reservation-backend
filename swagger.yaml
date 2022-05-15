@@ -1,0 +1,284 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'HUHS 동아리방 예약 서비스'
+  description: 'HUHS 동아리방 예약 서비스 백엔드 문서입니다.'
+
+servers:
+  - description: '프로젝트 Dev Server'
+    url: http://localhost:3000
+
+paths:
+  /api/v1/reservations:
+    post:
+      summary: 동방 예약 API
+      description: 동방 예약을 위한 API입니다.
+      tags:
+        - Reservation
+      requestBody:
+        description: Schema에 있는 데이터 타입에 맞게 body를 구성해서 보내주세요.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                studentId:
+                  type: string
+                department:
+                  type: string
+                purpose:
+                  type: string
+                year:
+                  type: integer
+                  minimum: 2022
+                  maximum: 2050
+                month:
+                  type: integer
+                  minimum: 1
+                  maximum: 12
+                day:
+                  type: integer
+                  minimum: 1
+                  maximum: 31
+                startTime:
+                  type: string
+                endTime:
+                  type: string
+                people:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+              required:
+                - name
+                - studentId
+                - department
+                - purpose
+                - year
+                - month
+                - day
+                - startTime
+                - endTime
+                - people
+              example:
+                name: Jessica Smith
+                studentId: '2011003928'
+                department: 기계공학부
+                purpose: 스터디
+                year: 2022
+                month: 6
+                day: 22
+                startTime: '19:30'
+                endTime: '21:30'
+                people: 4
+      responses:
+        '201':
+          description: 성공적으로 예약이 된 경우입니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  statusCode:
+                    type: integer
+                    example: 201
+                  data:
+                    $ref: '#/components/schemas/ReservationDTO'
+                  message:
+                    type: string
+                    nullable: true
+                    example: null
+        '400':
+          description: Body Property의 데이터 타입이 잘못된 경우 or 유효하지 않은 날짜인 경우 or 시간대가 겹치는 경우입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: 로그를 확인해야합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalServerError'
+  /api/v1/reservations/monthly:
+    get:
+      summary: 특정년월의 예약정보를 확인하는 API
+      description: year, month를 반드시 쿼리로 보내주세요.
+      tags:
+        - Reservation
+      parameters:
+        - in: query
+          name: year
+          required: true
+          schema:
+            type: integer
+          description: 반드시 2022 ~ 2050 사이의 숫자를 보내주세요. 기본값은 없습니다.
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: integer
+          description: 반드시 1 ~ 12 사이의 숫자를 보내주세요. 기본값은 없습니다.
+      responses:
+        '200':
+          description: 성공적으로 서버에서 결과를 받아온 경우입니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: string
+                    example: ['2022-05-14', '2022-05-16']
+                  message:
+                    type: string
+                    nullable: true
+                    example: null
+        '400':
+          description: Query의 데이터 타입이 잘못된 경우입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: 로그를 확인해야합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalServerError'
+  /api/v1/reservations/daily:
+    get:
+      summary: 특정년월일의 예약정보를 확인하는 API
+      description: year, month, day를 반드시 쿼리로 보내주세요.
+      tags:
+        - Reservation
+      parameters:
+        - in: query
+          name: year
+          required: true
+          schema:
+            type: integer
+          description: 반드시 2022 ~ 2050 사이의 숫자를 보내주세요. 기본값은 없습니다.
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: integer
+          description: 반드시 1 ~ 12 사이의 숫자를 보내주세요. 기본값은 없습니다.
+        - in: query
+          name: day
+          required: true
+          schema:
+            type: integer
+          description: 반드시 1 ~ 31 사이의 숫자를 보내주세요. 기본값은 없습니다.
+      responses:
+        '200':
+          description: 성공적으로 서버에서 결과를 받아온 경우입니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservationDTO'
+                  message:
+                    type: string
+                    nullable: true
+                    example: null
+        '400':
+          description: Query의 데이터 타입이 잘못된 경우입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: 로그를 확인해야합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalServerError'
+components:
+  schemas:
+    ReservationDTO:
+      properties:
+        purpose:
+          type: string
+          example: 스터디
+        year:
+          type: string
+          example: 2022
+        month:
+          type: string
+          example: 6
+        day:
+          type: string
+          example: 22
+        startTime:
+          type: string
+          example: '19:30'
+        endTime:
+          type: string
+          example: '21:30'
+        people:
+          type: string
+          example: 4
+        user:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Jessica Smith
+            department:
+              type: string
+              example: 기계공학부
+    BadRequest:
+      properties:
+        status:
+          type: string
+          example: 'error'
+        statusCode:
+          type: integer
+          example: 400
+        data:
+          type: string
+          nullable: true
+          example: null
+        message:
+          type: string
+          example: '"year" must be a number'
+    IntervalServerError:
+      properties:
+        status:
+          type: string
+          example: 'error'
+        statusCode:
+          type: integer
+          example: 500
+        data:
+          type: string
+          nullable: true
+          example: null
+        message:
+          type: string
+          example: 'Interval Server Error'
