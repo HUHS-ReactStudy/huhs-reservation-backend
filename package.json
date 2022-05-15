@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "prebuild": "./node_modules/.bin/rimraf ./dist",
+    "start": "node ./dist/index.js",
     "start:dev": "./node_modules/.bin/tsc-watch --outDir ./dist --onSuccess \"node ./dist/server.js\""
   },
   "repository": {
