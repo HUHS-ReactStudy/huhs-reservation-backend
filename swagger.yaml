@@ -4,10 +4,6 @@ info:
   title: 'HUHS 동아리방 예약 서비스'
   description: 'HUHS 동아리방 예약 서비스 백엔드 문서입니다.'
 
-servers:
-  - description: '프로젝트 Dev Server'
-    url: http://localhost:3000
-
 paths:
   /api/v1/reservations:
     post:
