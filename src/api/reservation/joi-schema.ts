@@ -21,5 +21,24 @@ export const addReservationBodySchema = Joi.object({
   day: Joi.number().min(1).max(31).required(),
   startTime: Joi.string().required(),
   endTime: Joi.string().required(),
-  people: Joi.number().min(1).max(10).required(),
+  description: Joi.string(),
+});
+
+export const checkReservationOwnerBodySchema = Joi.object({
+  reservationId: Joi.string().hex().length(24).required(),
+  studentId: Joi.string().required(),
+});
+
+export const patchOrDeleteReservationParamSchema = Joi.object({
+  reservationId: Joi.string().hex().length(24).required(),
+});
+
+export const patchReservationBodySchema = Joi.object({
+  purpose: Joi.string().required(),
+  year: Joi.number().min(2022).max(2050).required(),
+  month: Joi.number().min(1).max(12).required(),
+  day: Joi.number().min(1).max(31).required(),
+  startTime: Joi.string().required(),
+  endTime: Joi.string().required(),
+  description: Joi.string().required(),
 });
