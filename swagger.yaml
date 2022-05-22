@@ -4,10 +4,6 @@ info:
   title: 'HUHS 동아리방 예약 서비스'
   description: 'HUHS 동아리방 예약 서비스 백엔드 문서입니다.'
 
-servers:
-  - description: '프로젝트 Dev Server'
-    url: http://localhost:3000
-
 paths:
   /api/v1/reservations:
     post:
@@ -47,10 +43,8 @@ paths:
                   type: string
                 endTime:
                   type: string
-                people:
-                  type: integer
-                  minimum: 1
-                  maximum: 10
+                description:
+                  type: string
               required:
                 - name
                 - studentId
@@ -61,7 +55,7 @@ paths:
                 - day
                 - startTime
                 - endTime
-                - people
+                - description
               example:
                 name: Jessica Smith
                 studentId: '2011003928'
@@ -72,7 +66,7 @@ paths:
                 day: 22
                 startTime: '19:30'
                 endTime: '21:30'
-                people: 4
+                description: 'Description!!'
       responses:
         '201':
           description: 성공적으로 예약이 된 경우입니다.
@@ -218,10 +212,190 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IntervalServerError'
+  /api/v1/reservations/auth:
+    post:
+      summary: 해당 예약의 소유자인지 체크하는 API
+      description: 예약 ID와 학번을 보내주세요.
+      tags:
+        - Reservation
+      requestBody:
+        description: Schema에 있는 데이터 타입에 맞게 body를 구성해서 보내주세요.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reservationId:
+                  type: string
+                studentId:
+                  type: string
+      responses:
+        '200':
+          description: 성공적으로 서버에서 결과를 받아온 경우입니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                  message:
+                    type: string
+                    nullable: true
+                    example: null
+        '400':
+          description: 데이터 타입이 잘못된 경우입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: 로그를 확인해야합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalServerError'
+  /api/v1/reservations/{reservationId}:
+    put:
+      summary: 예약을 수정하기 위한 API입니다.
+      security:
+        - BearerAuth: [admin]
+      description: Authoriation에 토큰을 넣어서 요청을 보내야합니다. 그리고 예약 정보를 덮어씌우는 것이기 때문에, 변경하지 않는 필드의 정보도 같이 보내야합니다.
+      parameters:
+        - in: path
+          name: reservationId
+          schema:
+            type: string
+          required: true
+          description: 수정을 할 Reservation의 id입니다.
+      tags:
+        - Reservation
+      requestBody:
+        description: Schema에 있는 데이터 타입에 맞게 body를 구성해서 보내주세요.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                purpose:
+                  type: string
+                year:
+                  type: integer
+                  minimum: 2022
+                  maximum: 2050
+                month:
+                  type: integer
+                  minimum: 1
+                  maximum: 12
+                day:
+                  type: integer
+                  minimum: 1
+                  maximum: 31
+                startTime:
+                  type: string
+                endTime:
+                  type: string
+                description:
+                  type: string
+              required:
+                - purpose
+                - year
+                - month
+                - day
+                - startTime
+                - endTime
+                - description
+              example:
+                purpose: 스터디
+                year: 2022
+                month: 6
+                day: 22
+                startTime: '19:30'
+                endTime: '21:30'
+                description: 'Description!!'
+      responses:
+        '204':
+          description: 성공적으로 업데이트를 한 경우입니다.
+        '400':
+          description: 데이터 타입이 잘못된 경우입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: 로그를 확인해야합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalServerError'
+    delete:
+      summary: 예약을 삭제하기 위한 API입니다.
+      security:
+        - BearerAuth: [admin]
+      description: Authoriation에 토큰을 넣어서 요청을 보내야합니다.
+      parameters:
+        - in: path
+          name: reservationId
+          schema:
+            type: string
+          required: true
+          description: 삭제할 Reservation의 id입니다.
+      tags:
+        - Reservation
+      responses:
+        '200':
+          description: 성공적으로 삭제된 경우입니다.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'success'
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: string
+                    example: 정상적으로 삭제되었습니다.
+                  message:
+                    type: string
+                    nullable: true
+                    example: null
+        '400':
+          description: 데이터 타입이 잘못된 경우입니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: 로그를 확인해야합니다.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntervalServerError'
+
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
   schemas:
     ReservationDTO:
       properties:
+        reservationId:
+          type: string
+          example: 627f2fe9e827da9cb4b60411
         purpose:
           type: string
           example: 스터디
@@ -240,9 +414,6 @@ components:
         endTime:
           type: string
           example: '21:30'
-        people:
-          type: string
-          example: 4
         user:
           type: object
           properties:

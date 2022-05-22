@@ -14,8 +14,8 @@ export interface IReservation {
   day: number;
   startTime: string;
   endTime: string;
-  people: number;
   userId: ObjectId | IUser;
+  description: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -37,7 +37,7 @@ const ReservationSchema: Schema<IReservationDocument> = new Schema(
     day: { type: Number, required: true },
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },
-    people: { type: Number, required: true },
+    description: { type: String },
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
