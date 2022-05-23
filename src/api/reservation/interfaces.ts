@@ -21,4 +21,4 @@ export interface IPatchOrDeleteReservationParam {
 }
 
 export interface IPatchReservationRequestBody
-  extends Pick<IReservation, 'purpose' | 'year' | 'month' | 'day' | 'startTime' | 'endTime' | 'description'> {}
+  extends Pick<IReservation, 'purpose' | 'year' | 'month' | 'day' | 'startTime' | 'endTime' | 'description' | 'color'> {}

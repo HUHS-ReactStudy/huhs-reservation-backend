@@ -43,6 +43,8 @@ paths:
                   type: string
                 endTime:
                   type: string
+                color:
+                  type: string
                 description:
                   type: string
               required:
@@ -55,6 +57,7 @@ paths:
                 - day
                 - startTime
                 - endTime
+                - color
                 - description
               example:
                 name: Jessica Smith
@@ -66,6 +69,7 @@ paths:
                 day: 22
                 startTime: '19:30'
                 endTime: '21:30'
+                color: '#030303'
                 description: 'Description!!'
       responses:
         '201':
@@ -304,6 +308,8 @@ paths:
                   type: string
                 endTime:
                   type: string
+                color:
+                  type: string
                 description:
                   type: string
               required:
@@ -313,6 +319,7 @@ paths:
                 - day
                 - startTime
                 - endTime
+                - color
                 - description
               example:
                 purpose: 스터디
@@ -321,6 +328,7 @@ paths:
                 day: 22
                 startTime: '19:30'
                 endTime: '21:30'
+                color: '#030303'
                 description: 'Description!!'
       responses:
         '204':
@@ -411,6 +419,9 @@ components:
         startTime:
           type: string
           example: '19:30'
+        color:
+          type: string
+          example: '#030303'
         endTime:
           type: string
           example: '21:30'
