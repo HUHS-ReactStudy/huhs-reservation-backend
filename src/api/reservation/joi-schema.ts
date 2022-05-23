@@ -21,6 +21,9 @@ export const addReservationBodySchema = Joi.object({
   day: Joi.number().min(1).max(31).required(),
   startTime: Joi.string().required(),
   endTime: Joi.string().required(),
+  color: Joi.string()
+    .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/)
+    .required(),
   description: Joi.string(),
 });
 
@@ -40,5 +43,8 @@ export const patchReservationBodySchema = Joi.object({
   day: Joi.number().min(1).max(31).required(),
   startTime: Joi.string().required(),
   endTime: Joi.string().required(),
+  color: Joi.string()
+    .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/)
+    .required(),
   description: Joi.string().required(),
 });
